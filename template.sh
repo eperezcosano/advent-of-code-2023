@@ -5,7 +5,7 @@ mkdir -p ${day}
 template="/*
 *   --- Day X:  ---
 *          --- Part X ---
-*        Advent Of Code 2015
+*        Advent Of Code 2023
 * */
 
 const lineReader = require('readline').createInterface({
