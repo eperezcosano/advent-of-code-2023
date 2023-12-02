@@ -19,4 +19,3 @@ lineReader.on('close', () => {
     console.log('Result:', sum)
     // Result: 54390
 })
-
