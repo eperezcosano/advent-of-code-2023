@@ -17,8 +17,7 @@ lineReader.on('line', (line) => {
 
 lineReader.on('close', () => {
     // Result:
-})
-"
+})"
 
 echo "$template" > ${day}/${day}_1.js
 echo "$template" > ${day}/${day}_2.js
