@@ -13,15 +13,15 @@ const maps = [[], [], [], [], [], [], []]
 
 function getRangeSeeds() {
     const tmp = []
-    for (let i = 0; i < seeds.length; i++) {
-        if (i % 2 == 0) {
-            tmp.push([seeds[i], seeds[i] + seeds[i + 1] - 1])
+    for (let i = 0; i < rangeSeeds.length; i++) {
+        if (i % 2 === 0) {
+            tmp.push([rangeSeeds[i], rangeSeeds[i] + rangeSeeds[i + 1] - 1])
         }
     }
     return tmp
 }
 
-function getSegment([dest, src, range]) {
+function getSegment([, src, range]) {
     return [src, src + range - 1]
 }
 
@@ -67,9 +67,7 @@ function convertRangeSeedToMap([s1, s2], map) {
 
     const segments = map.filter(segment => !isOutOfRange([s1, s2], getSegment(segment)))
 
-    console.log('Segments', segments)
-
-    if (segments.length == 0) return [[s1, s2]]
+    if (segments.length === 0) return [[s1, s2]]
 
     const res = []
 
@@ -79,47 +77,37 @@ function convertRangeSeedToMap([s1, s2], map) {
 
         if (isLowBound([s1, s2], [m1, m2])) {
 
-            console.log('LowBound')
             const [processed, remain] = getLowBound([s1, s2], [m1, m2], dest)
-
             res.push(processed)
             s1 = remain[0]
 
         } else if (isMidRange([s1, s2], [m1, m2])) {
 
-            console.log('MidRange')
             const [rawProcessed, processed, remain] = getMidRange([s1, s2], [m1, m2], dest)
             res.push(rawProcessed)
             res.push(processed)
-
             s1 = remain[0]
 
         } else if (isWholeRange([s1, s2], [m1, m2])) {
 
-            console.log('WholeRange')
             const processed = getWholeRange([s1, s2], [m1, m2], dest)
-
             res.push(processed)
-            console.log('NOT CONTINUE')
+            break
 
         } else if (isHighBound([s1, s2], [m1, m2])) {
 
-            console.log('HighBound')
             const [remain, processed] = getHighBound([s1, s2], [m1, m2], dest)
             res.push(remain)
             res.push(processed)
-            console.log('NOT CONTINUE')
+            break
 
         } else {
-            console.log('Remain Range')
             res.push([s1, s2])
-            console.log('NOT CONTINUE')
+            break
         }
     }
-    console.log(res)
 
     return res
-
 }
 
 function convertSeedsToMap(allSeeds, map) {
@@ -129,9 +117,6 @@ function convertSeedsToMap(allSeeds, map) {
     for (const rangeSeed of allSeeds) {
         res.push(...convertRangeSeedToMap(rangeSeed, map))
     }
-
-    console.log('Final')
-    console.log(res)
 
     return res
 }
@@ -144,20 +129,18 @@ lineReader.on('line', (line) => {
         group++
     }
     else if (storeMap) maps[group].push(line.split(' ').map(val => parseInt(val)))
-    else if (line.startsWith('seeds: ')) seeds = line.split(': ')[1].split(' ').map(val => parseInt(val))
+    else if (line.startsWith('seeds: ')) rangeSeeds = line.split(': ')[1].split(' ').map(val => parseInt(val))
     else if (line.endsWith('map:')) storeMap = true
 })
 
 lineReader.on('close', () => {
+
     rangeSeeds = getRangeSeeds()
 
     for (const map of maps) {
         rangeSeeds = convertSeedsToMap(rangeSeeds, map)
     }
-
-    console.log('Final TOTAL', rangeSeeds)
-
-    const res = Math.min(...rangeSeeds.flatMap(val => val))
+    const res = Math.min(...rangeSeeds.map(val => val[0]))
     console.log('Result:', res)
     // Result: 26714516
 })
