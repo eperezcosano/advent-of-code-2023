@@ -5,7 +5,7 @@
 * */
 
 const lineReader = require('readline').createInterface({
-    input: require('fs').createReadStream('./day05_example.txt')
+    input: require('fs').createReadStream('./day05.txt')
 })
 
 let rangeSeeds = []
@@ -26,7 +26,7 @@ function convertRangeSeed([s1, s2], dest, m1, range) {
 
     // Out of Range
     if (s1 > m2 || m1 > s2) {
-        //console.log('Out of Range')
+        console.log('Out of Range')
         // 0 - not proccessed
         // 1 - processed
         return [[s1, s2], null]
@@ -34,7 +34,7 @@ function convertRangeSeed([s1, s2], dest, m1, range) {
 
     // Whole Range
     if (m1 <= s1 && m2 >= s2) {
-        //console.log('Whole Range')
+        console.log('Whole Range')
         // 0 - not proccessed
         // 1 - processed
         return [null, [dest + s1 - m1, dest + s2 - m1]]
@@ -42,7 +42,7 @@ function convertRangeSeed([s1, s2], dest, m1, range) {
 
     // Low Bound
     if (m1 <= s1 && m2 >= s1 && m2 < s2) {
-        //console.log('Low Bound')
+        console.log('Low Bound')
         // 0 - not proccessed
         // 1 - processed
         return [ [m2 + 1, s2], [dest + s1 - m1, dest + m2 - m1] ]
@@ -50,7 +50,7 @@ function convertRangeSeed([s1, s2], dest, m1, range) {
 
     // High Bound
     if (m1 > s1 && m1 <= s2 && m2 >= s2) {
-        //console.log('High Bound')
+        console.log('High Bound')
         // 0 - not proccessed
         // 1 - processed
         return [ [s1, m1 - 1], [dest, dest + s2 - m1] ]
@@ -58,7 +58,7 @@ function convertRangeSeed([s1, s2], dest, m1, range) {
 
     // Mid Range
     if (m1 > s1 && s2 > m2) {
-        //console.log('Mid Range')
+        console.log('Mid Range')
         // 0 - not proccessed
         // 1 - processed
         return [ [[s1, m1 - 1],[m2 + 1, s2]], [dest, dest + m2 - m1] ]
@@ -69,44 +69,155 @@ function convertRangeSeed([s1, s2], dest, m1, range) {
 
 }
 
+function getSegment([dest, src, range]) {
+    return [src, src + range - 1]
+}
+
+function isOutOfRange([s1, s2], [m1, m2]) {
+    return s1 > m2 || m1 > s2
+}
+
+function isLowBound([s1, s2], [m1, m2]) {
+    return m1 <= s1 && m2 >= s1 && m2 < s2
+}
+
+function getLowBound([s1, s2], [m1, m2], dest) {
+    return [ [dest + s1 - m1, dest + m2 - m1], [m2 + 1, s2] ]
+}
+
+function isHighBound([s1, s2], [m1, m2]) {
+    return m1 > s1 && m1 <= s2 && m2 >= s2
+}
+
+function getHighBound([s1, s2], [m1, m2], dest) {
+    return [ [s1, m1 - 1], [dest, dest + s2 - m1] ]
+}
+
+function isWholeRange([s1, s2], [m1, m2]) {
+    return m1 <= s1 && m2 >= s2
+}
+
+function getWholeRange([s1, s2], [m1, m2], dest) {
+    return [dest + s1 - m1, dest + s2 - m1]
+}
+
+function isMidRange([s1, s2], [m1, m2]) {
+    return m1 > s1 && s2 > m2
+}
+
+function getMidRange([s1, s2], [m1, m2], dest) {
+    return [ [s1, m1 - 1], [dest, dest + m2 - m1], [m2 + 1, s2]]
+}
+
+
+
+function convertRangeSeedToMap([s1, s2], map) {
+    //let [s1, s2] = [50, 100]
+    //const map = [ [4_000, 0, 2], [5_000, 90, 6], [6_000, 95, 1], [1_000, 500, 5] ]
+    map.sort((a, b) => a[1] - b[1])
+
+    const segments = map.filter(segment => !isOutOfRange([s1, s2], getSegment(segment)))
+
+    console.log('Segments', segments)
+
+    const res = []
+
+    for (let i = 0; i < segments.length; i++) {
+
+        const [dest, m1, m2] = [segments[i][0], segments[i][1], segments[i][1] + segments[i][2] - 1]
+
+        if (isLowBound([s1, s2], [m1, m2])) {
+
+            console.log('LowBound')
+            const [processed, remain] = getLowBound([s1, s2], [m1, m2], dest)
+
+            res.push(processed)
+            s1 = remain[0]
+
+        } else if (isMidRange([s1, s2], [m1, m2])) {
+
+            console.log('MidRange')
+            const [rawProcessed, processed, remain] = getMidRange([s1, s2], [m1, m2], dest)
+            res.push(rawProcessed)
+            res.push(processed)
+
+            s1 = remain[0]
+
+        } else if (isWholeRange([s1, s2], [m1, m2])) {
+
+            console.log('WholeRange')
+            const processed = getWholeRange([s1, s2], [m1, m2], dest)
+
+            res.push(processed)
+            console.log('NOT CONTINUE')
+
+        } else if (isHighBound([s1, s2], [m1, m2])) {
+
+            console.log('HighBound')
+            const [remain, processed] = getHighBound([s1, s2], [m1, m2], dest)
+            res.push(remain)
+            res.push(processed)
+            console.log('NOT CONTINUE')
+
+        } else {
+            console.log('Remain Range')
+            res.push([s1, s2])
+            console.log('NOT CONTINUE')
+        }
+    }
+    console.log(res)
+
+    return res
+
+}
+
+convertRangeSeedToMap()
+
+/*
 function sameRange([x1, x2], [y1, y2]) {
     return x1 == y1 && x2 == y2
 }
 
 function convert(map) {
 
-    const processedTotal = []
-    const notProcessedTotal = rangeSeeds.slice()
+    let res = []
+    for (const rangeSeed of rangeSeeds) {
 
-    let rangeSeed
-    const seen = new Set()
-    while (rangeSeed = notProcessedTotal.shift()) {
-        seen.add(rangeSeed.join('-'))
+        let notProcessedTotal = [rangeSeed.slice()]
+        console.log('RangeSeed', rangeSeed)
+
         for (const [dest, src, range] of map) {
-            const [notProcessed, processed] = convertRangeSeed(rangeSeed, dest, src, range)
-            
-            console.log('Processed', processed)
-            console.log('NotProcessed', notProcessed)
 
-            if (processed) processedTotal.push(processed)
-            if (notProcessed && !notProcessed[0].length) {
+            console.log('MapSeg', [dest, src, range])
 
-                if (!seen.has(notProcessed.join('-'))) notProcessedTotal.push(notProcessed)
+            for (let i = 0; i < notProcessedTotal.length; i++) {
 
-            } else if (notProcessed && notProcessed[0].length) {
+                console.log('segment', notProcessedTotal[i])
+                const [notProcessed, processed] = convertRangeSeed(notProcessedTotal[i], dest, src, range)
+                console.log('notProcessed', notProcessed)
+                console.log('processed', processed)
 
-                if (!seen.has(notProcessed[0].join('-'))) notProcessedTotal.push(notProcessed[0])
-                if (!seen.has(notProcessed[1].join('-'))) notProcessedTotal.push(notProcessed[1])
+                if (processed) res.push(processed)
+
+                if (!notProcessed) {
+                    notProcessedTotal = []
+                } else if (!notProcessed[0].length) {
+                    notProcessedTotal = [notProcessed]
+                } else if (notProcessed[0].length) {
+                    notProcessedTotal = notProcessed
+                }
+
+                console.log('notProcessedTotal', notProcessedTotal)
+                console.log('res', res)
 
             }
-/*
-            console.log('Total Processed', processedTotal)
-            console.log('Total NotProcessed', notProcessedTotal)
-            */
         }
-    }
 
-    return toa
+        res = res.concat(notProcessedTotal)
+        console.log('resConcat', res)
+    }
+    
+    return res
 }
 
 let storeMap = false
@@ -124,19 +235,16 @@ lineReader.on('line', (line) => {
 lineReader.on('close', () => {
     rangeSeeds = getRangeSeeds()
 
-    console.log(rangeSeeds)
+    for (const map of maps) {
+        rangeSeeds = convert(map)
+    }
 
-    rangeSeeds = convert(maps[0])
+    console.log('Final', rangeSeeds)
 
-    console.log(rangeSeeds)
-
-    rangeSeeds = convert(maps[1])
-
-    console.log(rangeSeeds)
-
-    /*
-    const res = Math.min(...seeds)
+    const res = Math.min(...rangeSeeds.flatMap(val => val))
     console.log('Result:', res)
-*/
     // Result: 
 })
+*/
+
+// Too high 72612023

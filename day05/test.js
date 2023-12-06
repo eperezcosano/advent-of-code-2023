@@ -1,11 +1,21 @@
-const arr = [ [1, 2] ]
+const arr = [ [1, 2], [3 , 4] ]
 const res1 = null
 const res2 = [3, 4]
 const res3 = [[3, 4], [5, 6]]
 
-console.log(res2[0].length, res3[0].length)
 
-if (!res2[0].length) console.log('hola')
 
-if (res3) arr.push(...res3)
-console.log(arr)
+const res = []
+
+console.log(res3.concat(arr))
+
+/*
+for (let i = 0; i < 3; i++) {
+	console.log('MapSegment', i)
+	let notProcessedTotal = [res2.slice()]
+	for (let n = 0; n < notProcessedTotal.length; n++) {
+		if (i == 1) notProcessedTotal = [[1, 2], [9, 8]]
+		if (i == 2) notProcessedTotal = [[6, 5]]
+		console.log(notProcessedTotal[n])
+	}
+}*/
