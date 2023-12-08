@@ -1,6 +1,6 @@
 {
   "name": "advent-of-code-2023",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Advent Of Code 2023 Solutions",
   "scripts": {
     "day01_1": "cd day01 && node day01_1.js",
