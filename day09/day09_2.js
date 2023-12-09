@@ -5,7 +5,7 @@
 * */
 
 const lineReader = require('readline').createInterface({
-    input: require('fs').createReadStream('./day09_example.txt')
+    input: require('fs').createReadStream('./day09.txt')
 })
 
 const sequences = []
@@ -16,15 +16,15 @@ function extrapolate(sequence) {
         res.push(sequence[i] - sequence[i - 1])
     }
     if (res.every(num => num == 0)) return 0
-    return extrapolate(res) + res[res.length - 1]
+    return res[0] - extrapolate(res)
 }
 
 lineReader.on('line', (line) => {
     sequences.push(line.split(' ').map(val => parseInt(val)))
 })
 
-lineReader.on('close', () => {    
-    const res = sequences.reduce((acc, sequence) => acc + extrapolate(sequence) + sequence[sequence.length - 1], 0)
+lineReader.on('close', () => {
+    const res = sequences.reduce((acc, sequence) => acc + sequence[0] - extrapolate(sequence), 0)
     console.log('Result:', res)
-    // Result: 
+    // Result: 903
 })
