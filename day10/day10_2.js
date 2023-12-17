@@ -5,11 +5,12 @@
 * */
 
 const lineReader = require('readline').createInterface({
-    input: require('fs').createReadStream('./day10_example.txt')
+    input: require('fs').createReadStream('./day10.txt')
 })
 
 const maze = []
 const loop = []
+const outside = []
 
 function getStart() {
     for (let y = 0; y < maze.length; y++) {
@@ -21,10 +22,10 @@ function getStart() {
 
 function findNextStartPosition() {
     const [y, x] = loop[0]
-    if (['|', '7', 'F'].includes(maze[y - 1][x])) return [y - 1, x]
-    if (['-', 'J', '7'].includes(maze[y][x + 1])) return [y, x + 1]
-    if (['|', 'L', 'J'].includes(maze[y + 1][x])) return [y + 1, x]
-    if (['-', 'L', 'F'].includes(maze[y + 1][x])) return [y, x - 1]
+    if (y > 0 && ['|', '7', 'F'].includes(maze[y - 1][x])) return [y - 1, x]
+    if (x < maze[y].length - 1 && ['-', 'J', '7'].includes(maze[y][x + 1])) return [y, x + 1]
+    if (y < maze.length - 1 && ['|', 'L', 'J'].includes(maze[y + 1][x])) return [y + 1, x]
+    if (x > 0 && ['-', 'L', 'F'].includes(maze[y][x - 1])) return [y, x - 1]
 }
 
 function goNextPipe() {
@@ -45,7 +46,6 @@ function goNextPipe() {
 }
 
 function replaceStartPipe() {
-
     const [sy, sx] = loop[0]
 
     const [fy, fx] = loop[1]
@@ -72,7 +72,6 @@ function replaceStartPipe() {
     else if (dlx == 1) startPipe = startPipe.filter(pipe => right.includes(pipe))
 
     maze[loop[0][0]][loop[0][1]] = startPipe[0]
-
 }
 
 function findLoop() {
@@ -87,8 +86,41 @@ function findLoop() {
     replaceStartPipe()
 }
 
+function removeUnusedPipes() {
+    for (let y = 0; y < maze.length; y++) {
+        for (let x = 0; x < maze[y].length; x++) {
+            if (loop.some(([loopY, loopX]) => loopY == y && loopX == x)) continue
+            maze[y][x] = '.'
+        }
+    }
+}
+
+function getOutside() {
+    removeUnusedPipes()
+    for (let y = 0; y < maze.length; y++) {
+        let inLoop = false
+        let faceUp = false
+        for (let x = 0; x < maze[y].length; x++) {
+            if (maze[y][x] == '|') inLoop = !inLoop
+            else if (maze[y][x] == 'L' || maze[y][x] == 'F') faceUp = maze[y][x] == 'L'
+            else if ((faceUp && maze[y][x] == '7') || (!faceUp && maze[y][x] == 'J')) inLoop = !inLoop
+            if (!inLoop) outside.push([y, x])
+        }
+    }
+}
+
 function getEnclosedTiles() {
-    
+    findLoop()
+    getOutside()
+    let sum = 0
+    for (let y = 0; y < maze.length; y++) {
+        for (let x = 0; x < maze[y].length; x++) {
+            if (outside.some(([loopY, loopX]) => loopY == y && loopX == x)) continue
+            else if (loop.some(([loopY, loopX]) => loopY == y && loopX == x)) continue
+            sum++
+        }
+    }
+    return sum
 }
 
 lineReader.on('line', (line) => {
@@ -96,8 +128,7 @@ lineReader.on('line', (line) => {
 })
 
 lineReader.on('close', () => {
-    findLoop()
-
-    console.log(loop.map(([y, x]) => maze[y][x]).join(''))
-    // Result:
+    const res = getEnclosedTiles()
+    console.log('Result:', res)
+    // Result: 483
 })
