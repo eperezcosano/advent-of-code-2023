@@ -5,7 +5,7 @@
 * */
 
 const lineReader = require('readline').createInterface({
-    input: require('fs').createReadStream('./day10.txt')
+    input: require('fs').createReadStream('./day10_example.txt')
 })
 
 const maze = []
@@ -28,38 +28,51 @@ function findNextStartPosition() {
 }
 
 function goNextPipe() {
-
     const [cy, cx] = loop[loop.length - 1]
     const [py, px] = loop[loop.length - 2]
     const pipe = maze[cy][cx]
 
-    if (pipe === '.') process.exit(0)
     if (pipe === 'S') return false
 
     const [dy, dx] = [cy - py, cx - px]
-    // UP   dy - 1
-    // DOWN dy + 1
-    // LEFT dx - 1
-    // RIGHT dx + 1
 
     if (dx == 0 && pipe === '|') return [cy + dy, cx]
     if (dy == 0 && pipe === '-') return [cy, cx + dx]
-
-    // IF GOING DOWN GO RIGHT if    dy = +1     dx = 0      cy, cx + 1
-    // IF GOING LEFT GO UP    if    dy = 0      dx = -1     cy - 1, cx
     if ((dy == 1 || dx == -1) && pipe === 'L') return [cy + dx, cx + dy]
-
-    // IF GOING DOWN GO LEFT if    dy = 1      dx = 0      cy, cx - 1
-    // IF GOING RIGHT GO UP  if    dy = 0      dx = +1     cy - 1, cx
     if ((dy == 1 || dx == 1) && pipe === 'J') return [cy - dx, cx - dy]
-
-    // IF GOING RIGHT GO DOWN if    dy = 0     dx = +1     cy + 1, cx
-    // IF GOING UP GO LEFT    if    dy = -1    dx = 0      cy, cx - 1
     if ((dy == -1 || dx == 1) && pipe === '7') return [cy + dx, cx + dy]
-
-    // IF GOING UP GO RIGHT     if    dy = -1    dx = 0     cy, cx + 1
-    // IF GOING LEFT GO DOWN    if    dy = 0     dx = -1    cy + 1, cx
     if ((dy == -1 || dx == -1) && pipe === 'F') return [cy - dx, cx - dy]
+}
+
+function replaceStartPipe() {
+
+    const [sy, sx] = loop[0]
+
+    const [fy, fx] = loop[1]
+    const [ly, lx] = loop[loop.length - 1]
+    
+    const [dfy, dfx] = [fy - sy, fx - sx]
+    const [dly, dlx] = [ly - sy, lx - sx]
+    
+    const up    = ['|', '7', 'F']
+    const down  = ['|', 'L', 'J']
+    const left  = ['-', 'J', '7']
+    const right = ['-', 'L', 'F']
+
+    let startPipe
+
+    if (dfy == -1) startPipe = down.slice()
+    else if (dfy == 1) startPipe = up.slice()
+    else if (dfx == -1) startPipe = left.slice()
+    else if (dfx == 1) startPipe = right.slice()
+
+    if (dly == -1) startPipe = startPipe.filter(pipe => down.includes(pipe))
+    else if (dly == 1) startPipe = startPipe.filter(pipe => up.includes(pipe))
+    else if (dlx == -1) startPipe = startPipe.filter(pipe => left.includes(pipe))
+    else if (dlx == 1) startPipe = startPipe.filter(pipe => right.includes(pipe))
+
+    maze[loop[0][0]][loop[0][1]] = startPipe[0]
+
 }
 
 function findLoop() {
@@ -71,9 +84,11 @@ function findLoop() {
         loop.push(nextPipe)
     }
     loop.pop()
-    console.log(loop)
-    loop.forEach(([y, x]) => console.log(maze[y][x]))
-    console.log(loop.length / 2)
+    replaceStartPipe()
+}
+
+function getEnclosedTiles() {
+    
 }
 
 lineReader.on('line', (line) => {
@@ -81,7 +96,8 @@ lineReader.on('line', (line) => {
 })
 
 lineReader.on('close', () => {
-    console.log(maze)
     findLoop()
+
+    console.log(loop.map(([y, x]) => maze[y][x]).join(''))
     // Result:
 })
