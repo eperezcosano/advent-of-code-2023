@@ -8,7 +8,10 @@ const lineReader = require('readline').createInterface({
     input: require('fs').createReadStream('./day11.txt')
 })
 
-let universe = []
+const expansion = 1_000_000
+const universe = []
+const emptyRows = []
+const emptyCols = []
 const galaxies = new Set()
 const distances = new Map()
 
@@ -16,23 +19,26 @@ function transpose(array) {
     return array[0].map((_, colIndex) => array.map(row => row[colIndex]))
 }
 
-function expandRows(arr) {
-    const tmp = []
+function expandRows(arr, isRow) {
     for (let y = 0; y < arr.length; y++) {
-        tmp.push(arr[y])
-        if (arr[y].every(space => space == '.')) tmp.push(arr[y])
+        if (arr[y].every(space => space == '.')) isRow ? emptyRows.push(y) : emptyCols.push(y)
     }
-    return tmp
 }
 
 function expandUniverse() {
-    universe = transpose(expandRows(transpose(expandRows(universe))))
+    expandRows(universe, true)
+    expandRows(transpose(universe), false)
+}
+
+function expansionOffset(input, isRow) {
+    const arr = isRow ? emptyRows : emptyCols
+    return arr.reduce((acc, val) => val < input ? acc + expansion - 1 : acc, 0)
 }
 
 function getGalaxies() {
     for (let y = 0; y < universe.length; y++) {
         for (let x = 0; x < universe[y].length; x++) {
-            if (universe[y][x] == '#') galaxies.add([y, x].join('-'))
+            if (universe[y][x] == '#') galaxies.add([y + expansionOffset(y, true), x + expansionOffset(x + false)].join('-'))
         }
     }
 }
@@ -63,7 +69,6 @@ lineReader.on('close', () => {
     getGalaxies()
     getDistances()
     const res = [...distances.values()].reduce((acc, val) => acc + val, 0)
-    console.log(res)
-    //console.log(universe.map(row => row.join('')).join('\n'))
-    // Result:
+    console.log('Result:', res)
+    // Result: 613686987427
 })
