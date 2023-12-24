@@ -5,7 +5,7 @@
 * */
 
 const lineReader = require('readline').createInterface({
-    input: require('fs').createReadStream('./day13_example.txt')
+    input: require('fs').createReadStream('./day13.txt')
 })
 
 const patterns = [[]]
@@ -16,18 +16,14 @@ function transpose(arr) {
 }
 
 function checkReflection(pattern, pos) {
-    //console.log('Check', pos)
-    //console.log(pattern.length, pattern.length - pos)
-    for (let n = 0; n < pattern.length - pos; n++) {
-        //console.log('Check', pattern[pos - n - 1], pattern[pos + n])
+    for (let n = 0; n < pattern.length - pos && pos - n > 0; n++) {
         if (pattern[pos - n - 1] != pattern[pos + n]) return false
     }
-    return true
+    return true 
 }
 
 function findReflection(pattern) {
     for (let i = 1; i < pattern.length; i++) {
-        //console.log(i, pattern[i - 1], pattern[i])
         if (pattern[i - 1] == pattern[i]) {
             if (checkReflection(pattern, i)) return i
         }
@@ -37,10 +33,8 @@ function findReflection(pattern) {
 
 function findReflections(pattern) {
     const vt = findReflection(transpose(pattern))
-    //console.log(vt)
     if (vt > 0) return vt
     const hz = findReflection(pattern)
-    //console.log(hz)
     return hz * 100
 }
 
@@ -64,9 +58,5 @@ lineReader.on('line', (line) => {
 lineReader.on('close', () => {
     const res = summarizeNotes()
     console.log('Result:', res)
-    // Result:
+    // Result: 31956
 })
-
-// Too low 
-// 27189
-// 29265
