@@ -5,7 +5,7 @@
 * */
 
 const lineReader = require('readline').createInterface({
-  input: require('fs').createReadStream('./input.txt'),
+  input: require('fs').createReadStream('./day14.txt'),
 });
 
 const cycles = 1_000_000_000;
@@ -109,13 +109,12 @@ function tiltBoard(orientation) {
 }
 
 function performCycles(cycles) {
+  const cycleOrientations = ['north', 'west', 'south', 'east'];
   for (let cycle = 1; cycle <= cycles; cycle++) {
-    const cycleOrientations = ['north', 'west', 'south', 'east'];
     for (const orientation of cycleOrientations) {
       tiltBoard(orientation);
     }
     const val = platform.map((row) => row.join('')).join('');
-
     if (cache.has(val)) {
       const offset = cycle - cache.get(val);
       const repetition = Math.floor((cycles - cycle) / offset);
@@ -130,13 +129,7 @@ lineReader.on('line', (line) => platform.push(line.split('')));
 
 lineReader.on('close', () => {
   performCycles(cycles);
-  const res = platform.reduce(
-    (acc, row, i) =>
-      acc +
-      (platform.length - i) *
-        row.reduce((acc, val) => (val == 'O' ? ++acc : acc), 0),
-    0
-  );
+  const res = platform.reduce((acc, row, i) => acc + (platform.length - i) * row.reduce((acc, val) => (val == 'O' ? ++acc : acc), 0), 0);
   console.log('Result:', res);
   // Result: 96105
 });
