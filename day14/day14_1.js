@@ -1,6 +1,6 @@
 /*
 *   --- Day 14: Parabolic Reflector Dish ---
-*                --- Part Two ---
+*                --- Part One ---
 *              Advent Of Code 2023
 * */
 
