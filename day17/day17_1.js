@@ -1,16 +1,55 @@
 /*
-*   --- Day X:  ---
-*          --- Part X ---
-*        Advent Of Code 2023
-* */
-
+ *   --- Day 17: Clumsy Crucible ---
+ *           --- Part One ---
+ *         Advent Of Code 2023
+ * */
+const Heap = require('heap');
 const lineReader = require('readline').createInterface({
-    input: require('fs').createReadStream('./day17.txt')
-})
+  input: require('fs').createReadStream('./day17.txt'),
+});
 
-lineReader.on('line', (line) => {
-})
+const grid = [];
+
+function dijkstra() {
+  const queue = new Heap((a, b) => a[0] - b[0]);
+  const seen = new Set();
+
+  queue.push([0, 0, 0, 0, 0, 0]); // H, Y, X, DY, DX, N
+
+  while (!queue.empty()) {
+    const [h, y, x, dy, dx, n] = queue.pop();
+
+    if (seen.has([y, x, dy, dx, n].join())) continue;
+    seen.add([y, x, dy, dx, n].join());
+
+    if (y == grid.length - 1 && x == grid[0].length - 1) return h;
+
+    if (n < 3 && [dy, dx].join() != '0,0') {
+      const ny = y + dy;
+      const nx = x + dx;
+      if (ny >= 0 && ny < grid.length && nx >= 0 && nx < grid[0].length) {
+        queue.push([h + grid[ny][nx], ny, nx, dy, dx, n + 1]);
+      }
+    }
+
+    for (const [ndy, ndx] of [[0, 1], [1, 0], [0, -1], [-1, 0]]) {
+      if ([ndy, ndx].join() != [dy, dx].join() && [ndy, ndx].join() != [-dy, -dx].join()) {
+        const ny = y + ndy;
+        const nx = x + ndx;
+        if (ny >= 0 && ny < grid.length && nx >= 0 && nx < grid[0].length) {
+            queue.push([h + grid[ny][nx], ny, nx, ndy, ndx, 1])
+        }
+      }
+    }
+  }
+}
+
+lineReader.on('line', (line) =>
+  grid.push([...line].map((val) => parseInt(val)))
+);
 
 lineReader.on('close', () => {
-    // Result:
-})
+  const res = dijkstra();
+  console.log('Result:', res);
+  // Result: 859
+});
