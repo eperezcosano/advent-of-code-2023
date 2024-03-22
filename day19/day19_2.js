@@ -9,37 +9,31 @@ const lineReader = require('readline').createInterface({
 })
 
 const workflows = new Map()
-const parts = []
 
 function evaluateWorkflow(part) {
 
     const rules = workflows.get(part.dest)
     const defaultResponse = rules[rules.length - 1]
-
     const nextParts = []
 
     for (const rule of rules) {
         if (!rule.includes(':')) break
 
         const [statement, response] = rule.split(':')
-
         const category = statement.substring(0, 1)
         const operation = statement.substring(1, 2)
         const value = parseInt(statement.slice(2))
-
         const newPart = JSON.parse(JSON.stringify(part))
-        let newRange = newPart[category]
 
         if (operation == '<') {
-            newRange[1] = value - 1
+            newPart[category][1] = value - 1
             part[category][0] = value
         } else {
-            newRange[0] = value + 1
+            newPart[category][0] = value + 1
             part[category][1] = value
         }
 
         newPart.dest = response
-        newPart[category] = newRange
         nextParts.push(newPart)
     }
 
