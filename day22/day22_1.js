@@ -5,76 +5,63 @@
  * */
 
 const lineReader = require('readline').createInterface({
-  input: require('fs').createReadStream('./example.txt'),
+  input: require('fs').createReadStream('./day22.txt'),
 });
 
 const bricks = [];
 
-function getBottom(brick) {
-  return Math.min(brick.start.z, brick.end.z);
-}
-
-function getTop(brick) {
-  return Math.max(brick.start.z, brick.end.z);
-}
-
-function isOnSettledBrick(brick) {
-  const settledBricks = bricks.filter((brick) => brick.settled);
-  for (const other of settledBricks) {
-    if (getTop(other) == getBottom(brick) - 1) return true;
-  }
-  return false;
-}
-
-function canGoDown(brick, other) {
+function overlaps(a, b) {
   return (
-    (brick.start.x > Math.max(other.start.x, other.end.x) ||
-      brick.end.x < Math.min(other.start.x, other.end.x)) &&
-    (brick.start.y > Math.max(other.start.y, other.end.y) ||
-      brick.end.y < Math.min(other.start.y, other.end.y))
+    Math.max(a.x1, b.x1) <= Math.min(a.x2, b.x2) &&
+    Math.max(a.y1, b.y1) <= Math.min(a.y2, b.y2)
   );
-}
-
-function fall(brick) {
-  const layerDown = bricks.filter(
-    (other) => getTop(other) == getBottom(brick) - 1
-  );
-
-  if (layerDown.every((other) => canGoDown(brick, other))) {
-    brick.start.z--;
-    brick.end.z--;
-  }
 }
 
 function fallDown() {
-  while (bricks.some((brick) => !brick.settled)) {
-    for (const brick of bricks) {
-      if (brick.settled) continue;
-      if (getBottom(brick) == 1 || isOnSettledBrick(brick)) {
-        brick.settled = true;
-        continue;
-      }
-      fall(brick);
+  for (const [i, brick] of bricks.entries()) {
+    let z = 1;
+    for (const other of bricks.slice(0, i)) {
+      if (overlaps(brick, other)) z = Math.max(z, other.z2 + 1);
+      brick.z2 -= brick.z1 - z;
+      brick.z1 = z;
     }
   }
 }
 
+function getDesintegrated() {
+  const supports = Array.from({ length: bricks.length }, () => new Set());
+  const supported = Array.from({ length: bricks.length }, () => new Set());
+
+  for (const [j, upper] of bricks.entries()) {
+    for (const [i, lower] of bricks.slice(0, j).entries()) {
+      if (overlaps(lower, upper) && upper.z1 == lower.z2 + 1) {
+        supports[i].add(j);
+        supported[j].add(i);
+      }
+    }
+  }
+
+  return bricks.reduce(
+    (total, _, i) =>
+      Array.from(supports[i]).every((j) => supported[j].size >= 2)
+        ? ++total
+        : total,
+    0
+  );
+}
+
 lineReader.on('line', (line) => {
-  const [start, end] = line
-    .split('~')
-    .map((val) => val.split(',').map((val) => parseInt(val)));
-  bricks.push({
-    id: bricks.length,
-    start: { x: start[0], y: start[1], z: start[2] },
-    end: { x: end[0], y: end[1], z: end[2] },
-    settled: false,
-  });
+  const [x1, y1, z1, x2, y2, z2] = line
+    .replace('~', ',')
+    .split(',')
+    .map(Number);
+  bricks.push({ x1, y1, z1, x2, y2, z2 });
 });
 
 lineReader.on('close', () => {
-  bricks.sort((a, b) => getBottom(a) - getBottom(b));
+  bricks.sort((a, b) => a.z1 - b.z1);
   fallDown();
-  console.log(bricks);
-  // console.log('Result:', res);
-  // Result:
+  const res = getDesintegrated();
+  console.log('Result:', res);
+  // Result: 530
 });
