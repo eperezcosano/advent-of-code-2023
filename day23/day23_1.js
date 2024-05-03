@@ -34,7 +34,7 @@ function fillGraph() {
         '<': [[0, -1]],
         '>': [[0, 1]],
         '.': [[-1, 0], [1, 0], [0, -1], [0, 1]]
-    };
+    }
 
     for (const [cy, cx] of points) {
         const queue = [[0, cy, cx]]

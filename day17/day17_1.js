@@ -68,8 +68,8 @@ function dijkstra() {
 
         for (const [ndy, ndx] of [[0, 1], [1, 0], [0, -1], [-1, 0]]) {
             if ([ndy, ndx].join() != [dy, dx].join() && [ndy, ndx].join() != [-dy, -dx].join()) {
-                const ny = y + ndy;
-                const nx = x + ndx;
+                const ny = y + ndy
+                const nx = x + ndx
                 if (ny >= 0 && ny < grid.length && nx >= 0 && nx < grid[0].length) {
                     enqueue([h + grid[ny][nx], ny, nx, ndy, ndx, 1])
                 }

@@ -77,7 +77,7 @@ function startBeam(start) {
                 seen.add(beam.join('-'))
                 queue.push(beam)
             }
-        });
+        })
     }
 
     const total = energized.size

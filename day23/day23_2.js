@@ -6,7 +6,7 @@
 
 const lineReader = require('readline').createInterface({
     input: require('fs').createReadStream('./day23.txt'),
-});
+})
 
 const map = []
 const points = []

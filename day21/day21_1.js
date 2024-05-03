@@ -37,7 +37,7 @@ lineReader.on('line', (line) => {
         row[sx] = '.'
     }
     grid.push(row)
-});
+})
 
 lineReader.on('close', () => {
     for (let n = 0; n < 64; n++) moveStep()

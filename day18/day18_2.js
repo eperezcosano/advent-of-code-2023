@@ -34,7 +34,7 @@ lineReader.on('line', (line) => {
     const n = parseInt(raw.substring(2, 7), 16)
     const dir = parseInt(raw.substring(7, 8))
     digPlan.push([dir, n])
-});
+})
 
 lineReader.on('close', () => {
     const b = startDigging()

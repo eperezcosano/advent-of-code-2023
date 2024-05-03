@@ -61,7 +61,7 @@ function getDisintegrated() {
 lineReader.on('line', (line) => {
     const [x1, y1, z1, x2, y2, z2] = line.replace('~', ',').split(',').map(Number)
     bricks.push({ x1, y1, z1, x2, y2, z2 })
-});
+})
 
 lineReader.on('close', () => {
     bricks.sort((a, b) => a.z1 - b.z1)

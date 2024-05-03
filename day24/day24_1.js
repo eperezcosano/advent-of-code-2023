@@ -17,7 +17,7 @@ function intersect([x1, y1, , vx1, vy1], [x2, y2, , vx2, vy2]) {
     const x = (c2 - c1) / (m1 - m2)
     const y = m1 * x + c1
     const [t1, t2] = [(x - x1) / vx1, (x - x2) / vx2]
-    if (t1 < 0 || t2 < 0) return false;
+    if (t1 < 0 || t2 < 0) return false
     return !(x < testArea[0] || y < testArea[0] || x > testArea[1] || y > testArea[1])
 }
 

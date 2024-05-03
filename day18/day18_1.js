@@ -15,7 +15,7 @@ function startDigging() {
     let [y, x] = [0, 0]
     let b = 0
     for (const [dir, n] of digPlan) {
-        b += n;
+        b += n
         if (dir == 'R') x += n
         else if (dir == 'L') x -= n
         else if (dir == 'U') y -= n
