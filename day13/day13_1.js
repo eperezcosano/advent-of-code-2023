@@ -38,14 +38,6 @@ function findReflections(pattern) {
     return hz * 100
 }
 
-function summarizeNotes() {
-    let sum = 0
-    for (pattern of patterns) {
-        sum += findReflections(pattern)
-    }
-    return sum
-}
-
 let group = 0
 lineReader.on('line', (line) => {
     if (line.length == 0) {
@@ -56,7 +48,7 @@ lineReader.on('line', (line) => {
 })
 
 lineReader.on('close', () => {
-    const res = summarizeNotes()
+    const res = patterns.reduce((acc, pattern) => acc + findReflections(pattern), 0)
     console.log('Result:', res)
     // Result: 31956
 })
