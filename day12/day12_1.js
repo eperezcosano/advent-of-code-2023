@@ -24,7 +24,7 @@ function count(string, nums) {
 let sum = 0
 
 lineReader.on('line', (line) => {
-    const [string, nums] = line.split(' ').map((val, i) => i == 1 ? val.split(',').map(num => parseInt(num)) : val)
+    const [string, nums] = line.split(' ').map((val, i) => i == 1 ? val.split(',').map(Number) : val)
     sum += count(string.slice(), nums.slice())
 })
 

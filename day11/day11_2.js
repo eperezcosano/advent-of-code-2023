@@ -44,14 +44,14 @@ function getGalaxies() {
 }
 
 function getDistance(galaxyA, galaxyB) {
-    const [y1, x1] = galaxyA.split('-').map(val => parseInt(val))
-    const [y2, x2] = galaxyB.split('-').map(val => parseInt(val))
+    const [y1, x1] = galaxyA.split('-').map(Number)
+    const [y2, x2] = galaxyB.split('-').map(Number)
     return Math.abs(x1 - x2) + Math.abs(y1 - y2)
 }
 
 function getDistances() {
-    for (galaxyA of galaxies) {
-        for (galaxyB of galaxies) {
+    for (const galaxyA of galaxies) {
+        for (const galaxyB of galaxies) {
             if (galaxyA == galaxyB) continue
             if (distances.has([galaxyA, galaxyB].join('-')) || distances.has([galaxyB, galaxyA].join('-'))) continue
             const distance = getDistance(galaxyA, galaxyB)
@@ -60,9 +60,7 @@ function getDistances() {
     }
 }
 
-lineReader.on('line', (line) => {
-    universe.push(line.split(''))
-})
+lineReader.on('line', (line) => universe.push(line.split('')))
 
 lineReader.on('close', () => {
     expandUniverse()
