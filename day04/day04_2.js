@@ -12,8 +12,7 @@ let n = 0
 const cards = new Array(212).fill(1)
 
 lineReader.on('line', (line) => {
-    line = line.split(': ')
-    const [wins, haves] = line[1].split(' | ').map(str => str.split(' ').flatMap(val => parseInt(val)).filter(val => !isNaN(val)))
+    const [wins, haves] = line.split(': ')[1].split(' | ').map(str => str.split(' ').flatMap(val => parseInt(val)).filter(val => !isNaN(val)))
     const matches = haves.reduce((acc, have) => wins.includes(have) ? ++acc : acc, 0)
     const currentCard = n++
     for (let i = currentCard + 1; i < cards.length && i < currentCard + matches + 1; i++) {
