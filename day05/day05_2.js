@@ -128,8 +128,8 @@ lineReader.on('line', (line) => {
         storeMap = false
         group++
     }
-    else if (storeMap) maps[group].push(line.split(' ').map(val => parseInt(val)))
-    else if (line.startsWith('seeds: ')) rangeSeeds = line.split(': ')[1].split(' ').map(val => parseInt(val))
+    else if (storeMap) maps[group].push(line.split(' ').map(Number))
+    else if (line.startsWith('seeds: ')) rangeSeeds = line.split(': ')[1].split(' ').map(Number)
     else if (line.endsWith('map:')) storeMap = true
 })
 
