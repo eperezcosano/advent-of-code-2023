@@ -19,9 +19,7 @@ function extrapolate(sequence) {
     return res[0] - extrapolate(res)
 }
 
-lineReader.on('line', (line) => {
-    sequences.push(line.split(' ').map(val => parseInt(val)))
-})
+lineReader.on('line', (line) => sequences.push(line.split(' ').map(Number)))
 
 lineReader.on('close', () => {
     const res = sequences.reduce((acc, sequence) => acc + sequence[0] - extrapolate(sequence), 0)
