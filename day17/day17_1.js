@@ -3,21 +3,54 @@
  *           --- Part One ---
  *         Advent Of Code 2023
  * */
-const Heap = require('heap');
 const lineReader = require('readline').createInterface({
   input: require('fs').createReadStream('./day17.txt'),
 });
 
 const grid = [];
+const queue = [];
+
+function swap(n, m) {
+  const tmp = queue[n]
+  queue[n] = queue[m]
+  queue[m] = tmp
+}
+
+function enqueue(element) {
+  queue.push(element)
+  let n = queue.length - 1
+  while (n > 0) {
+    const p = Math.floor((n - 1) / 2)
+    if (queue[p][0] <= queue[n][0]) break
+    swap(p, n)
+    n = p
+  }
+}
+
+function dequeue() {
+  if (queue.length == 0) return null
+  const element = queue[0]
+  queue[0] = queue[queue.length - 1]
+  queue.pop()
+  let n = 0
+  while (true) {
+    const l = 2 * n + 1
+    const r = l + 1
+    if (l >= queue.length) break
+    const c = (r < queue.length && queue[r][0] < queue[l][0]) ? r : l
+    if (queue[n][0] < queue[c][0]) break
+    else swap(n, c)
+    n = c
+  }
+  return element
+}
 
 function dijkstra() {
-  const queue = new Heap((a, b) => a[0] - b[0]);
   const seen = new Set();
+  enqueue([0, 0, 0, 0, 0, 0])
 
-  queue.push([0, 0, 0, 0, 0, 0]); // H, Y, X, DY, DX, N
-
-  while (!queue.empty()) {
-    const [h, y, x, dy, dx, n] = queue.pop();
+  while (queue.length) {
+    const [h, y, x, dy, dx, n] = dequeue();
 
     if (seen.has([y, x, dy, dx, n].join())) continue;
     seen.add([y, x, dy, dx, n].join());
@@ -28,7 +61,7 @@ function dijkstra() {
       const ny = y + dy;
       const nx = x + dx;
       if (ny >= 0 && ny < grid.length && nx >= 0 && nx < grid[0].length) {
-        queue.push([h + grid[ny][nx], ny, nx, dy, dx, n + 1]);
+        enqueue([h + grid[ny][nx], ny, nx, dy, dx, n + 1])
       }
     }
 
@@ -37,7 +70,7 @@ function dijkstra() {
         const ny = y + ndy;
         const nx = x + ndx;
         if (ny >= 0 && ny < grid.length && nx >= 0 && nx < grid[0].length) {
-            queue.push([h + grid[ny][nx], ny, nx, ndy, ndx, 1])
+          enqueue([h + grid[ny][nx], ny, nx, ndy, ndx, 1])
         }
       }
     }
@@ -45,7 +78,7 @@ function dijkstra() {
 }
 
 lineReader.on('line', (line) =>
-  grid.push([...line].map((val) => parseInt(val)))
+    grid.push([...line].map((val) => parseInt(val)))
 );
 
 lineReader.on('close', () => {

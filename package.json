@@ -66,8 +66,5 @@
     "type": "git",
     "url": "https://github.com/eperezcosano/advent-of-code-2023.git"
   },
-  "license": "MIT",
-  "dependencies": {
-    "heap": "^0.2.7"
-  }
+  "license": "MIT"
 }
